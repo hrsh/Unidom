@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Unidom
 {
-    internal class Utils
+    internal struct Utils
     {
         private readonly RNGCryptoServiceProvider _cryptoServiceProvider;
         private readonly UnikyOptions _options;
@@ -14,7 +14,7 @@ namespace Unidom
         private static readonly string _numbers = "0123456789";
         private static readonly string _specialChars = @"!@#$%*~[]{}/|\=+";
 
-        private readonly char[] _source = new char[0];
+        private readonly char[] _source;
         private string _resultHolder;
 
         public Utils(UnikyOptions options)
@@ -41,6 +41,7 @@ namespace Unidom
             if (_options.UseSpecialLetters)
                 builder.Append(_specialChars);
 
+            _source = new char[0];
             _source = builder.ToString().ToCharArray();
             _resultHolder = string.Empty;
         }
@@ -66,6 +67,76 @@ namespace Unidom
                 _resultHolder += @char;
             }
 
+            return _resultHolder;
+        }
+
+        internal string Odd(int length, bool allowDuplicate = false)
+        {
+            if (!allowDuplicate)
+                if (_numbers.Length < length)
+                    throw new ArgumentException("Source length could not be less than output lenght!");
+
+            for (var i = 1; i <= length; i++)
+            {
+                var @char = _numbers[Position % _numbers.Length];
+                if (!_options.AllowDuplicate && _resultHolder.Contains(@char))
+                {
+                    do
+                    {
+                        @char = _numbers[Position % _numbers.Length];
+                    } while (_resultHolder.Contains(@char));
+                }
+                if (i == 0 && @char == '0')
+                {
+                    do
+                    {
+                        @char = _numbers[Position % _numbers.Length];
+                    } while (@char == '0');
+                }
+                if (i == length)
+                {
+                    while ((@char - '0') % 2 != 0)
+                    {
+                        @char = _numbers[Position % _numbers.Length];
+                    }
+                }
+                _resultHolder += @char;
+            }
+            return _resultHolder;
+        }
+
+        internal string Even(int length, bool allowDuplicate = false)
+        {
+            if (!allowDuplicate)
+                if (_numbers.Length < length)
+                throw new ArgumentException("Source length could not be less than output lenght!");
+
+            for (var i = 1; i <= length; i++)
+            {
+                var @char = _numbers[Position % _numbers.Length];
+                if (!_options.AllowDuplicate && _resultHolder.Contains(@char))
+                {
+                    do
+                    {
+                        @char = _numbers[Position % _numbers.Length];
+                    } while (_resultHolder.Contains(@char));
+                }
+                if (i == 0 && @char == '0')
+                {
+                    do
+                    {
+                        @char = _numbers[Position % _numbers.Length];
+                    } while (@char == '0');
+                }
+                if (i == length)
+                {
+                    while ((@char - '0') % 2 == 0)
+                    {
+                        @char = _numbers[Position % _numbers.Length];
+                    }
+                }
+                _resultHolder += @char;
+            }
             return _resultHolder;
         }
 
